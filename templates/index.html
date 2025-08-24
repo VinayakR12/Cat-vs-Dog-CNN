@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cat vs Dog Classifier</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    header, footer {
+      background-color: #009688; /* Teal instead of Blue */
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    footer {
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .container h2 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .upload-label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    input[type="file"] {
+      padding: 10px;
+      border: 2px solid #009688;
+      border-radius: 8px;
+      background-color: #e0f2f1;
+      cursor: pointer;
+      width: 96%;
+    }
+
+    #imageContainer {
+      margin-top: 20px;
+      width: 100%;
+      height: 240px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: white;
+      overflow: hidden;
+    }
+
+    #imagePreview {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin-top: 15px;
+      background-color: #009688;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #00796b;
+    }
+
+    #resultBox {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fffde7;
+      border-radius: 8px;
+      border-left: 5px solid #fbc02d;
+      display: none;
+      color: #795548;
+      font-weight: bold;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        margin: 20px;
+        padding: 15px;
+      }
+    }
+  </style>
+  <script>
+    function previewImage(event) {
+      let reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById("imagePreview").src = e.target.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function uploadImage() {
+      let formData = new FormData();
+      let file = document.getElementById("imageInput").files[0];
+      if (!file) {
+        alert("Please select an image first!");
+        return;
+      }
+      formData.append("file", file);
+      fetch("/predict", { method: "POST", body: formData })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("resultBox").style.display = "block";
+          document.getElementById("resultBox").innerText =
+            "Prediction: " + data.prediction;
+        })
+        .catch(err => console.error(err));
+    }
+  </script>
+</head>
+<body>
+
+<header>
+  <h1>🐱 Cat vs Dog Classifier 🐶</h1>
+</header>
+
+<div class="container">
+  <h2>Upload an Image</h2>
+  <label class="upload-label" for="imageInput">Choose a cat or dog image</label>
+  <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
+  <div id="imageContainer">
+    <img id="imagePreview" src="">
+  </div>
+  <button onclick="uploadImage()">Predict</button>
+  <div id="resultBox"></div>
+</div>
+
+<footer>
+  &copy; <span id="year"></span> Cat vs Dog Classifier | Developed by <strong>Vinayak Rhatankar</strong>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
